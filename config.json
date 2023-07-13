@@ -1,0 +1,17 @@
+{
+    "audio": [".mp3", ".wav", ".flac", ".m4a"],
+    "video": [".mp4", ".mkv", ".flv", ".avi"],
+    "image": [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp", ".ico", ".tiff", ".psd", ".svgz"],
+    "document": [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".rtf"],
+    "archive": [".dmg", ".zip", ".rar", ".tar", ".gz", ".7z"],
+    "executable": [".exe", ".msi"],
+    "programming": [
+        ".c", ".h", ".cpp", ".hpp", ".cc", ".cxx", ".h", ".hxx", ".cs", ".java", ".py", ".pyc",
+        ".pyd", ".pyo", ".pyw", ".pyz", ".js", ".html", ".htm", ".css", ".php", ".rb", ".swift",
+        ".go", ".rs", ".kt", ".kts", ".ts", ".tsx", ".pl", ".pm", ".sh", ".bash", ".ps1",
+        ".psm1", ".m", ".r", ".rdata", ".rds", ".lua", ".scala", ".groovy", ".dart", ".hs",
+        ".lhs", ".lisp", ".lsp", ".pl", ".f", ".f90", ".f95", ".asm", ".m", ".swift", ".dart",
+        ".jl", ".erl", ".hrl", ".cr", ".ex", ".exs", ".ml", ".mli", ".fs", ".fsx", ".fsi",
+        ".fsproj", ".vhd", ".vhdl", ".v", ".vlog"
+    ]
+}
