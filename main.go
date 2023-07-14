@@ -17,14 +17,7 @@ type DownloadOrganizer struct {
 var (
 	downloads_path = filepath.Join(os.Getenv("HOME"), "Downloads")
 	prependDate    = flag.Bool("prependDate", false, "Prepend the date to the filename")
-)
-
-// NewDownloadOrganizer creates a new instance of DownloadOrganizer.
-//
-// It takes a string parameter `downloadsPath` which represents the path to the downloads directory.
-// It returns a pointer to DownloadOrganizer.
-func NewDownloadOrganizer(downloadsPath string) *DownloadOrganizer {
-	FileExtensions := map[string][]string{
+	fileExtensions = map[string][]string{
 		"audio":      {".mp3", ".wav", ".flac", ".m4a"},
 		"video":      {".mp4", ".mkv", ".flv", ".avi"},
 		"image":      {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp", ".ico", ".tiff", ".psd", ".svgz"},
@@ -41,9 +34,16 @@ func NewDownloadOrganizer(downloadsPath string) *DownloadOrganizer {
 			".fsproj", ".vhd", ".vhdl", ".v", ".vlog",
 		},
 	}
+)
+
+// NewDownloadOrganizer creates a new instance of DownloadOrganizer.
+//
+// It takes a string parameter `downloadsPath` which represents the path to the downloads directory.
+// It returns a pointer to DownloadOrganizer.
+func NewDownloadOrganizer(downloadsPath string) *DownloadOrganizer {
 
 	return &DownloadOrganizer{
-		FileExtensions: FileExtensions,
+		FileExtensions: fileExtensions,
 		DownloadsPath:  downloadsPath,
 	}
 }
