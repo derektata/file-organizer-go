@@ -84,7 +84,7 @@
 				<key>Class Name</key>
 				<string>RunShellScriptAction</string>
 				<key>InputUUID</key>
-				<string>94FFB645-EDFF-4F52-9287-4CFB1C9ED933</string>
+				<string>518841A2-98C5-4DE7-8719-0238505CF473</string>
 				<key>Keywords</key>
 				<array>
 					<string>Shell</string>
@@ -94,9 +94,9 @@
 					<string>Unix</string>
 				</array>
 				<key>OutputUUID</key>
-				<string>C8AD2B35-916D-4F68-A611-A5C980D7B39A</string>
+				<string>BD6D4A54-1471-437B-A2C0-4B6BF94A251B</string>
 				<key>UUID</key>
-				<string>C2C1FF88-59CE-41D6-AFCA-3EFEE779D4EC</string>
+				<string>9CA15207-B3D3-4436-B5E3-48B33ADDB66D</string>
 				<key>UnlocalizedApplications</key>
 				<array>
 					<string>Automator</string>
@@ -169,10 +169,12 @@
 						<string>4</string>
 					</dict>
 				</dict>
+				<key>conversionLabel</key>
+				<integer>0</integer>
 				<key>isViewVisible</key>
 				<integer>1</integer>
 				<key>location</key>
-				<string>309.000000:184.000000</string>
+				<string>309.000000:252.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Run Shell Script.action/Contents/Resources/Base.lproj/main.nib</string>
 			</dict>
@@ -184,8 +186,10 @@
 	<dict/>
 	<key>workflowMetaData</key>
 	<dict>
+		<key>folderActionFolderPath</key>
+		<string>~/Downloads</string>
 		<key>workflowTypeIdentifier</key>
-		<string>com.apple.Automator.workflow</string>
+		<string>com.apple.Automator.folderAction</string>
 	</dict>
 </dict>
 </plist>
