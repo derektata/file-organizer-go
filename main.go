@@ -41,9 +41,7 @@ func (o *FileOrganizer) MoveFile(filePath, fileName string, prependDate bool) er
 
 				newFileName := fileName
 				if prependDate {
-					// Generate the current time and format it to string
 					currentTime := time.Now().Format("2006-01-02")
-					// Add the current time to the beginning of the file name
 					newFileName = fmt.Sprintf("%s_%s", currentTime, fileName)
 				}
 
@@ -74,28 +72,23 @@ func (o *FileOrganizer) OrganizeFiles(prependDate bool) {
 }
 
 func main() {
-	// Define a command-line flag for the path
 	var path string
 	var prependDate bool
 	flag.StringVarP(&path, "path", "p", "", "Path to organize files")
 	flag.BoolVarP(&prependDate, "prepend-date", "d", false, "Prepend the current date to the file name")
 	flag.Parse()
 
-	// Read the JSON file
 	data, err := os.ReadFile(configPath)
 	checkErr(err, "Failed to read config file: %s", configPath)
 
-	// Create a FileOrganizer instance
 	organizer := FileOrganizer{
 		FileExtensions: make(map[string][]string),
 		Path:           path,
 	}
 
-	// Unmarshal the JSON data into the FileExtensions field
 	err = json.Unmarshal(data, &organizer.FileExtensions)
 	checkErr(err, "Failed to unmarshal config file: %s", configPath)
 
-	// Organize the files
 	organizer.OrganizeFiles(prependDate)
 }
 
