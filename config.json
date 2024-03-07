@@ -1,17 +1,60 @@
 {
-    "audio": [".mp3", ".wav", ".flac", ".m4a"],
-    "video": [".mp4", ".mkv", ".flv", ".avi"],
-    "image": [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp", ".ico", ".tiff", ".psd", ".svgz"],
-    "document": [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".rtf"],
-    "archive": [".dmg", ".zip", ".rar", ".tar", ".gz", ".7z"],
-    "executable": [".exe", ".msi"],
+    "3d-model": [
+        ".3ds", ".3mf", ".asm", ".blend", ".cgr", ".dae", ".dxf", ".f3d",
+        ".fbx", ".glb", ".gltf", ".iam", ".iges", ".igs", ".ipt", ".jt",
+        ".obj", ".par", ".ply", ".prj", ".prt", ".sat", ".sldasm", ".sldprt",
+        ".step", ".stp", ".stl", ".usd", ".usda", ".usdc", ".usdz",
+        ".vrml", ".wrl", ".x3d", ".x3db", ".x3dv", ".x3dzip"
+    ],
+    "audio": [
+        ".aac", ".ac3", ".aiff", ".alac", ".amr", ".ape", ".dts",
+        ".flac", ".m4a", ".mid", ".midi", ".mp3", ".ogg", ".opus",
+        ".ra", ".wav", ".wma"
+    ],
+    "video": [
+        ".3gp", ".avi", ".divx", ".flv", ".m4v", ".mkv", ".mov",
+        ".mp4", ".mpeg", ".mpg", ".rmvb", ".vob", ".webm", ".wmv"
+    ],
+    "image": [
+        ".ai", ".bmp", ".eps", ".gif", ".heic", ".ico", ".jpeg",
+        ".jpg", ".png", ".psd", ".pxd", ".raw", ".svg", ".svgz",
+        ".tga", ".tif", ".tiff", ".webp", ".xcf"
+    ],
+    "document": [
+        ".doc", ".docx", ".epub", ".md", ".odp", ".ods", ".odt",
+        ".pdf", ".ppt", ".pptx", ".rtf", ".tex", ".txt", ".wpd",
+        ".wps", ".xls", ".xlsx"
+    ],
+    "archive": [
+        ".7z", ".arj", ".bz2", ".cab", ".dmg", ".gz", ".iso",
+        ".jar", ".lz", ".lzma", ".rar", ".tar", ".tar.gz", ".tgz",
+        ".xz", ".zip", ".zipx"
+    ],
+    "executable": [
+        ".apk", ".app", ".bat", ".bin", ".cgi", ".cmd", ".com",
+        ".dll", ".exe", ".gadget", ".jar", ".msi", ".pif", ".scr",
+        ".vbs", ".wsf"
+    ],
+    "presentation": [
+        ".key", ".odp", ".pps", ".ppt", ".pptx"
+    ],
+    "spreadsheet": [
+        ".ods", ".ots", ".xlsx"
+    ],
     "programming": [
-        ".c", ".h", ".cpp", ".hpp", ".cc", ".cxx", ".h", ".hxx", ".cs", ".java", ".py", ".pyc",
-        ".pyd", ".pyo", ".pyw", ".pyz", ".js", ".html", ".htm", ".css", ".php", ".rb", ".swift",
-        ".go", ".rs", ".kt", ".kts", ".ts", ".tsx", ".pl", ".pm", ".sh", ".bash", ".ps1",
-        ".psm1", ".m", ".r", ".rdata", ".rds", ".lua", ".scala", ".groovy", ".dart", ".hs",
-        ".lhs", ".lisp", ".lsp", ".pl", ".f", ".f90", ".f95", ".asm", ".m", ".swift", ".dart",
-        ".jl", ".erl", ".hrl", ".cr", ".ex", ".exs", ".ml", ".mli", ".fs", ".fsx", ".fsi",
-        ".fsproj", ".vhd", ".vhdl", ".v", ".vlog"
+        ".adb", ".ads", ".asm", ".bash", ".c", ".cc", ".clj",
+        ".cljs", ".cljc", ".cls", ".cmake", ".coffee", ".cpp",
+        ".cr", ".cs", ".css", ".cxx", ".d", ".dart", ".el", ".elm",
+        ".erl", ".ex", ".exs", ".f", ".f90", ".f95", ".fs", ".fsi",
+        ".fsproj", ".fsx", ".go", ".groovy", ".h", ".hrl", ".hpp",
+        ".hs", ".htm", ".html", ".hxx", ".java", ".jl", ".js",
+        ".json", ".jsx", ".kt", ".kts", ".lhs", ".lisp", ".lsp",
+        ".lua", ".m", ".md", ".ml", ".mli", ".nim", ".pas", ".php",
+        ".pl", ".pm", ".ps1", ".psm1", ".py", ".pyc", ".pyd",
+        ".pyo", ".pyw", ".pyz", ".r", ".rdata", ".rds", ".rb",
+        ".rs", ".s", ".scala", ".scm", ".scss", ".sh", ".sql",
+        ".swift", ".ts", ".tsx", ".v", ".vba", ".vbs", ".vhd",
+        ".vhdl", ".vim", ".vlog", ".wasm", ".xml", ".yaml", ".yml",
+        ".zig", ".zsh"
     ]
 }
