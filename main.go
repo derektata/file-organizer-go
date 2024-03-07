@@ -1,101 +1,43 @@
 package main
 
 import (
-	"flag"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	flag "github.com/spf13/pflag"
 )
 
-type DownloadOrganizer struct {
+var configPath string = os.Getenv("HOME") + "/.config/file-organizer/config.json"
+
+type FileOrganizer struct {
 	FileExtensions map[string][]string
-	DownloadsPath  string
+	Path           string
 }
 
-var (
-	downloads_path = filepath.Join(os.Getenv("HOME"), "Downloads")
-	prependDate    = flag.Bool("prependDate", false, "Prepend the date to the filename")
-	fileExtensions = map[string][]string{
-		"audio":      {".mp3", ".wav", ".flac", ".m4a"},
-		"video":      {".mp4", ".mkv", ".flv", ".avi"},
-		"image":      {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp", ".ico", ".tiff", ".psd", ".svgz"},
-		"document":   {".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".rtf"},
-		"archive":    {".dmg", ".zip", ".rar", ".tar", ".gz", ".7z"},
-		"executable": {".exe", ".msi"},
-		"programming": {
-			".c", ".h", ".cpp", ".hpp", ".cc", ".cxx", ".h", ".hxx", ".cs", ".java", ".py", ".pyc",
-			".pyd", ".pyo", ".pyw", ".pyz", ".js", ".html", ".htm", ".css", ".php", ".rb", ".swift",
-			".go", ".rs", ".kt", ".kts", ".ts", ".tsx", ".pl", ".pm", ".sh", ".bash", ".ps1",
-			".psm1", ".m", ".r", ".rdata", ".rds", ".lua", ".scala", ".groovy", ".dart", ".hs",
-			".lhs", ".lisp", ".lsp", ".pl", ".f", ".f90", ".f95", ".asm", ".m", ".swift", ".dart",
-			".jl", ".erl", ".hrl", ".cr", ".ex", ".exs", ".ml", ".mli", ".fs", ".fsx", ".fsi",
-			".fsproj", ".vhd", ".vhdl", ".v", ".vlog",
-		},
-	}
-)
-
-// NewDownloadOrganizer creates a new instance of DownloadOrganizer.
-//
-// It takes a string parameter `downloadsPath` which represents the path to the downloads directory.
-// It returns a pointer to DownloadOrganizer.
-func NewDownloadOrganizer(downloadsPath string) *DownloadOrganizer {
-
-	return &DownloadOrganizer{
-		FileExtensions: fileExtensions,
-		DownloadsPath:  downloadsPath,
-	}
-}
-
-func main() {
-	flag.Parse()
-	organizer := NewDownloadOrganizer(downloads_path)
-	organizer.OrganizeDownloads(*prependDate)
-}
-
-// OrganizeDownloads organizes the downloaded files by moving them to the appropriate directory.
-//
-// prependDate specifies whether or not to prepend the date to the file name.
-// This function does not return anything.
-func (o *DownloadOrganizer) OrganizeDownloads(prependDate bool) {
-	files, err := os.ReadDir(o.DownloadsPath)
-	if err != nil {
-		fmt.Println("Error reading directory:", err)
-		return
-	}
-
-	for _, file := range files {
-		if !file.IsDir() {
-			err := o.MoveFile(filepath.Join(o.DownloadsPath, file.Name()), file.Name(), prependDate)
-			if err != nil {
-				fmt.Println("Error moving file:", err)
-				return
-			}
-		}
-	}
-}
-
-// MoveFile moves a file to a specified category based on its file extension.
+// MoveFile moves the file to a categorized directory based on its extension and optionally prepends the date to the file name.
 //
 // Parameters:
-// - filePath: the path of the file to be moved.
-// - fileName: the name of the file to be moved.
-// - prependDate: a flag indicating whether to prepend the current date to the file name.
 //
-// Returns:
-// - error: an error if any occurred during the file moving process, otherwise nil.
-func (o *DownloadOrganizer) MoveFile(filePath, fileName string, prependDate bool) error {
+// - filePath: the path of the file to be moved
+//
+// - fileName: the name of the file to be moved
+//
+// - prependDate: a boolean indicating whether to prepend the date to the file name
+//
+// Returns error.
+func (o *FileOrganizer) MoveFile(filePath, fileName string, prependDate bool) error {
 	fileExtension := strings.ToLower(filepath.Ext(fileName))
 
 	for category, extensions := range o.FileExtensions {
 		for _, extension := range extensions {
 			if fileExtension == extension {
-				categoryPath := filepath.Join(o.DownloadsPath, category)
+				categoryPath := filepath.Join(o.Path, category)
 				err := os.MkdirAll(categoryPath, os.ModePerm)
-				if err != nil {
-					return err
-				}
+				checkErr(err, "Failed to create directory: %s", categoryPath)
 
 				newFileName := fileName
 				if prependDate {
@@ -106,12 +48,73 @@ func (o *DownloadOrganizer) MoveFile(filePath, fileName string, prependDate bool
 				}
 
 				err = os.Rename(filePath, filepath.Join(categoryPath, newFileName))
-				if err != nil {
-					return err
-				}
+				checkErr(err, "Failed to move file: %s", filePath)
 				return nil
 			}
 		}
 	}
 	return nil
+}
+
+// OrganizeFiles organizes files in the specified directory, optionally prepending the date to the filenames.
+//
+// Parameters:
+//
+// - prependDate: a boolean indicating whether to prepend the date to the filenames bool
+func (o *FileOrganizer) OrganizeFiles(prependDate bool) {
+	files, err := os.ReadDir(o.Path)
+	checkErr(err, "Failed to read directory: %s", o.Path)
+
+	for _, file := range files {
+		if !file.IsDir() {
+			err := o.MoveFile(filepath.Join(o.Path, file.Name()), file.Name(), prependDate)
+			checkErr(err, "Failed to move file: %s", file.Name())
+		}
+	}
+}
+
+func main() {
+	// Define a command-line flag for the path
+	var path string
+	var prependDate bool
+	flag.StringVarP(&path, "path", "p", "", "Path to organize files")
+	flag.BoolVarP(&prependDate, "prepend-date", "d", false, "Prepend the current date to the file name")
+	flag.Parse()
+
+	// Read the JSON file
+	data, err := os.ReadFile(configPath)
+	checkErr(err, "Failed to read config file: %s", configPath)
+
+	// Create a FileOrganizer instance
+	organizer := FileOrganizer{
+		FileExtensions: make(map[string][]string),
+		Path:           path,
+	}
+
+	// Unmarshal the JSON data into the FileExtensions field
+	err = json.Unmarshal(data, &organizer.FileExtensions)
+	checkErr(err, "Failed to unmarshal config file: %s", configPath)
+
+	// Organize the files
+	organizer.OrganizeFiles(prependDate)
+}
+
+// checkErr checks for an error and prints a message with optional format and arguments before exiting the program if an error is found.
+//
+// Parameters:
+//
+// - err: the error to check
+//
+// - format: the format string for the error message
+//
+// - a: the arguments for the format string
+func checkErr(err error, format string, a ...interface{}) {
+	if err != nil {
+		if format != "" {
+			msg := fmt.Sprintf(format, a...)
+			fmt.Println(msg)
+		}
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(1)
+	}
 }
