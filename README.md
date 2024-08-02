@@ -1,5 +1,7 @@
 # file-organizer
 
+<img src="./.github/image.png" width="600px">
+
 Organize your downloaded files into categorical folders as they are downloaded.
 
 This package was made to be used on macOS machines using Automator and Folder Actions.
