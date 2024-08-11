@@ -36,7 +36,7 @@ func MoveAndCreateDir(filePath, categoryPath, newFileName string, dryRun bool) e
 	destPath := filepath.Join(categoryPath, newFileName)
 	if dryRun {
 		// Add to the directory tree for dry-run visualization
-		directoryTree.AddFile(destPath)
+		directoryTree.AddFileToTree(destPath)
 		return nil
 	}
 
