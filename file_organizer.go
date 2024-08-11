@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+var configPath string = filepath.Join(os.Getenv("HOME"), ".config/file-organizer/config.json")
+
 type FileOrganizer struct {
 	FileExtensions map[string][]string
 	Path           string
