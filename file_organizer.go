@@ -9,15 +9,13 @@ import (
 	"time"
 )
 
-var configPath string = filepath.Join(os.Getenv("HOME"), ".config/file-organizer/config.json")
-
 type FileOrganizer struct {
 	FileExtensions map[string][]string
 	Path           string
 }
 
-// NewFileOrganizer creates a new FileOrganizer with configurations loaded from a file.
-func NewFileOrganizer(path string) (*FileOrganizer, error) {
+// NewFileOrganizer creates a new FileOrganizer with configurations loaded from a specified config file.
+func NewFileOrganizer(path string, configPath string) (*FileOrganizer, error) {
 	data, err := os.ReadFile(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read config file %s: %v", configPath, err)
@@ -35,7 +33,7 @@ func NewFileOrganizer(path string) (*FileOrganizer, error) {
 }
 
 // OrganizeFiles organizes files in the specified directory, optionally prepending the date to the filenames.
-func (o *FileOrganizer) OrganizeFiles(prependDate bool) error {
+func (o *FileOrganizer) OrganizeFiles(prependDate bool, dryRun bool) error {
 	files, err := os.ReadDir(o.Path)
 	if err != nil {
 		return fmt.Errorf("failed to read directory %s: %v", o.Path, err)
@@ -46,7 +44,7 @@ func (o *FileOrganizer) OrganizeFiles(prependDate bool) error {
 			continue
 		}
 
-		err := o.MoveFile(filepath.Join(o.Path, file.Name()), file.Name(), prependDate)
+		err := o.MoveFile(filepath.Join(o.Path, file.Name()), file.Name(), prependDate, dryRun)
 		if err != nil {
 			return fmt.Errorf("failed to move file %s: %v", file.Name(), err)
 		}
@@ -54,27 +52,30 @@ func (o *FileOrganizer) OrganizeFiles(prependDate bool) error {
 	return nil
 }
 
-// MoveFile moves the file to a categorized directory based on its extension and optionally prepends the date to the file name.
-func (o *FileOrganizer) MoveFile(filePath, fileName string, prependDate bool) error {
+// MoveFile moves the file to a categorized directory based on its extension or MIME type and optionally prepends the date to the file name.
+func (o *FileOrganizer) MoveFile(filePath, fileName string, prependDate, dryRun bool) error {
 	fileExtension := strings.ToLower(filepath.Ext(fileName))
 
 	category, found := o.findCategory(fileExtension)
 	if !found {
-		return nil
+		// Fallback to MIME type detection if no category found in config
+		category = o.categoryFromMimeType(filePath)
+		if category == "" {
+			return nil // No appropriate category found, skip file
+		}
 	}
 
 	categoryPath := filepath.Join(o.Path, category)
-	newFileName := fileName
-
 	if prependDate {
-		currentTime := time.Now().Format("2006-01-02")
-		newFileName = fmt.Sprintf("%s_%s", currentTime, fileName)
+		newFileName := fmt.Sprintf("%s-%s", time.Now().Format("2006-01-02"), fileName)
+		return MoveAndCreateDir(filePath, categoryPath, newFileName, dryRun)
 	}
 
-	return MoveAndCreateDir(filePath, categoryPath, newFileName)
+	return MoveAndCreateDir(filePath, categoryPath, fileName, dryRun)
 }
 
-// findCategory finds the category for a given file extension.
+// findCategory finds the category of a file based on its extension.
+// This method is used to categorize files according to the loaded configuration.
 func (o *FileOrganizer) findCategory(extension string) (string, bool) {
 	for category, extensions := range o.FileExtensions {
 		if contains(extensions, extension) {
@@ -82,14 +83,4 @@ func (o *FileOrganizer) findCategory(extension string) (string, bool) {
 		}
 	}
 	return "", false
-}
-
-// contains checks if a slice contains a specific element.
-func contains[T comparable](slice []T, element T) bool {
-	for _, e := range slice {
-		if e == element {
-			return true
-		}
-	}
-	return false
 }
