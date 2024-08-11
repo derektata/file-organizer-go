@@ -23,7 +23,7 @@ type DirectoryNode struct {
 // It takes a filePath as a parameter and updates the DirectoryTree accordingly.
 // The filePath is a string representing the path of the file to be added.
 // Return type: None.
-func (tree *DirectoryTree) AddFile(filePath string) {
+func (tree *DirectoryTree) AddFileToTree(filePath string) {
 	relativePath := strings.TrimPrefix(filePath, tree.Root.Name)
 	parts := strings.Split(relativePath, string(os.PathSeparator))
 	current := tree.Root
