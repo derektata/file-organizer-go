@@ -17,13 +17,14 @@ make
 ## Usage
 
 ```
-Usage of file-organizer:
-  -p, --path string    Path to organize files
-  -d, --prepend-date   Prepend the current date to the file name
+Usage of ./file-organizer:
+  -c, --config string      The path to the configuration file (default "~/.config/file-organizer/config.json")
+  -d, --directory string   Path to organize files
+      --prepend-date       Prepend the current date to the file name
 
 Examples:
-  ./file-organizer -p ~/Downloads
-  ./file-organizer -p ~/Downloads -d
+  ./file-organizer -d ~/Downloads
+  ./file-organizer -d ~/Downloads --prepend-date
 ```
 
 ## License
