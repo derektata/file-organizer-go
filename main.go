@@ -1,6 +1,7 @@
 package main
 
 import (
+	"file-organizer/config"
 	"file-organizer/pkg"
 	"log"
 	"os"
@@ -29,22 +30,27 @@ func main() {
 		log.Fatal("Please specify a directory to organize using the --directory or -d flag.")
 	}
 
+	// Load the configuration
+	configLoader, err := config.NewConfigLoader(*configPath)
+	pkg.CheckErr(err, "Error loading configuration")
+
 	// Initialize the FileOrganizer
-	organizer, err := pkg.NewFileOrganizer(*directory, *configPath)
-	pkg.CheckErr(err, "Error initializing FileOrganizer")
+	organizer := pkg.NewFileOrganizer(*directory, configLoader, pkg.OrganizerOptions{
+		PrependDate: *prependDate,
+		DryRun:      *dryRun,
+	})
 
 	// Organize the files
 	if *dryRun {
 		log.Println("Running in dry-run mode. No files will be moved.")
 	}
-	err = organizer.OrganizeFiles(*prependDate, *dryRun, directoryTree)
+
+	err = organizer.OrganizeFiles(directoryTree)
 	pkg.CheckErr(err, "Error organizing files")
 
 	// Print the tree view of the specified directory
-	if *dryRun {
-		log.Println("Tree view of the planned organization:")
-		absolutePath, err := filepath.Abs(*directory)
-		pkg.CheckErr(err, "Error getting absolute path of directory")
-		directoryTree.PrintSubTree(absolutePath)
-	}
+	log.Println("Tree view of the planned organization:")
+	absolutePath, err := filepath.Abs(*directory)
+	pkg.CheckErr(err, "Error getting absolute path of directory")
+	directoryTree.PrintSubTree(absolutePath)
 }
