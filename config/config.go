@@ -58,7 +58,7 @@ func RegisterDefaultConfig() {
 	if !configExists {
 		fmt.Println("Configuration file not found at:", configPath)
 		if shouldCreateEmptyConfig() {
-			config := getDefaultConfig(configPath)
+			config := getDefaultConfig()
 			if createConfigDirectory(configPath) && createConfigFile(configPath, config) {
 				fmt.Println("Empty configuration created at:", configPath)
 			}
@@ -79,28 +79,22 @@ func getConfigPath() string {
 	return filepath.Join(os.Getenv("HOME"), ".config/file-organizer/config.json")
 }
 
-// getDefaultConfig returns a pointer to a ConfigLoader struct with default values.
-//
-// Parameters:
-// - configPath: a string representing the path to the configuration file.
+// getDefaultConfig returns a FileExtensions map with default values.
 //
 // Returns:
-// - *ConfigLoader: a pointer to a ConfigLoader struct with default values.
-func getDefaultConfig(configPath string) *ConfigLoader {
-	return &ConfigLoader{
-		Path: configPath,
-		FileExtensions: types.FileExtensions{
-			"3d-model":     {},
-			"audio":        {},
-			"video":        {},
-			"image":        {},
-			"document":     {},
-			"archive":      {},
-			"application":  {},
-			"presentation": {},
-			"spreadsheet":  {},
-			"programming":  {},
-		},
+// - types.FileExtensions: a map of file extensions to their corresponding category lists.
+func getDefaultConfig() types.FileExtensions {
+	return types.FileExtensions{
+		"3d-model":     {},
+		"audio":        {},
+		"video":        {},
+		"image":        {},
+		"document":     {},
+		"archive":      {},
+		"application":  {},
+		"presentation": {},
+		"spreadsheet":  {},
+		"programming":  {},
 	}
 }
 
@@ -155,11 +149,11 @@ func createConfigDirectory(configPath string) bool {
 //
 // Parameters:
 // - configPath: the path to the configuration file.
-// - config: a pointer to the ConfigLoader struct.
+// - extensions: the FileExtensions map.
 //
 // Returns:
 // - a boolean indicating whether the file was created successfully.
-func createConfigFile(configPath string, config *ConfigLoader) bool {
+func createConfigFile(configPath string, extensions types.FileExtensions) bool {
 	file, err := os.Create(configPath)
 	if err != nil {
 		fmt.Println("Error creating config file:", err)
@@ -169,7 +163,8 @@ func createConfigFile(configPath string, config *ConfigLoader) bool {
 
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "    ")
-	if err := encoder.Encode(config); err != nil {
+	// Serialize the FileExtensions map directly
+	if err := encoder.Encode(extensions); err != nil {
 		fmt.Println("Error writing to config file:", err)
 		return false
 	}
