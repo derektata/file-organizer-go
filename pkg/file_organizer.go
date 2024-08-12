@@ -1,13 +1,12 @@
 package pkg
 
 import (
+	"file-organizer/config"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
-
-	"file-organizer/config"
 )
 
 // FileOrganizer organizes files in a directory based on configuration and strategies.
