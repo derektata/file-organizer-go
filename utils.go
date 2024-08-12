@@ -28,11 +28,8 @@ func CheckErr(err error, format string, a ...interface{}) {
 	}
 }
 
-// Initialize a global DirectoryTree for tracking
-var directoryTree = DirectoryTree{Root: &DirectoryNode{Name: ".", Children: make(map[string]*DirectoryNode)}}
-
 // MoveAndCreateDir creates the directory if it doesn't exist and moves the file to the new location.
-func MoveAndCreateDir(filePath, categoryPath, newFileName string, dryRun bool) error {
+func MoveAndCreateDir(filePath, categoryPath, newFileName string, dryRun bool, directoryTree *DirectoryTree) error {
 	destPath := filepath.Join(categoryPath, newFileName)
 	if dryRun {
 		// Add to the directory tree for dry-run visualization
