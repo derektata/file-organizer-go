@@ -8,6 +8,13 @@ import (
 	"github.com/spf13/pflag"
 )
 
+var directoryTree = DirectoryTree{
+	Root: &DirectoryNode{
+		Name:     ".",
+		Children: make(map[string]*DirectoryNode),
+	},
+}
+
 func main() {
 	// Inline argument parsing using pflag
 	directory := pflag.StringP("directory", "d", "", "The path to the directory to organize")
@@ -29,7 +36,7 @@ func main() {
 	if *dryRun {
 		log.Println("Running in dry-run mode. No files will be moved.")
 	}
-	err = organizer.OrganizeFiles(*prependDate, *dryRun)
+	err = organizer.OrganizeFiles(*prependDate, *dryRun, &directoryTree)
 	CheckErr(err, "Error organizing files")
 
 	// Print the tree view of the specified directory
