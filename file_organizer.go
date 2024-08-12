@@ -33,7 +33,7 @@ func NewFileOrganizer(path string, configPath string) (*FileOrganizer, error) {
 }
 
 // OrganizeFiles organizes files in the specified directory, optionally prepending the date to the filenames.
-func (o *FileOrganizer) OrganizeFiles(prependDate bool, dryRun bool) error {
+func (o *FileOrganizer) OrganizeFiles(prependDate bool, dryRun bool, directoryTree *DirectoryTree) error {
 	files, err := os.ReadDir(o.Path)
 	if err != nil {
 		return fmt.Errorf("failed to read directory %s: %v", o.Path, err)
@@ -44,7 +44,7 @@ func (o *FileOrganizer) OrganizeFiles(prependDate bool, dryRun bool) error {
 			continue
 		}
 
-		err := o.MoveFile(filepath.Join(o.Path, file.Name()), file.Name(), prependDate, dryRun)
+		err := o.MoveFile(filepath.Join(o.Path, file.Name()), file.Name(), prependDate, dryRun, directoryTree)
 		if err != nil {
 			return fmt.Errorf("failed to move file %s: %v", file.Name(), err)
 		}
@@ -53,7 +53,7 @@ func (o *FileOrganizer) OrganizeFiles(prependDate bool, dryRun bool) error {
 }
 
 // MoveFile moves the file to a categorized directory based on its extension or MIME type and optionally prepends the date to the file name.
-func (o *FileOrganizer) MoveFile(filePath, fileName string, prependDate, dryRun bool) error {
+func (o *FileOrganizer) MoveFile(filePath, fileName string, prependDate, dryRun bool, directoryTree *DirectoryTree) error {
 	fileExtension := strings.ToLower(filepath.Ext(fileName))
 
 	category, found := o.findCategory(fileExtension)
@@ -66,16 +66,15 @@ func (o *FileOrganizer) MoveFile(filePath, fileName string, prependDate, dryRun 
 	}
 
 	categoryPath := filepath.Join(o.Path, category)
+	newFileName := fileName
 	if prependDate {
-		newFileName := fmt.Sprintf("%s-%s", time.Now().Format("2006-01-02"), fileName)
-		return MoveAndCreateDir(filePath, categoryPath, newFileName, dryRun)
+		newFileName = fmt.Sprintf("%s-%s", time.Now().Format("2006-01-02"), fileName)
 	}
 
-	return MoveAndCreateDir(filePath, categoryPath, fileName, dryRun)
+	return MoveAndCreateDir(filePath, categoryPath, newFileName, dryRun, directoryTree)
 }
 
 // findCategory finds the category of a file based on its extension.
-// This method is used to categorize files according to the loaded configuration.
 func (o *FileOrganizer) findCategory(extension string) (string, bool) {
 	for category, extensions := range o.FileExtensions {
 		if contains(extensions, extension) {
