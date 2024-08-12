@@ -30,7 +30,7 @@
         ".jar", ".lz", ".lzma", ".rar", ".tar", ".tar.gz", ".tgz",
         ".xz", ".zip", ".zipx"
     ],
-    "executable": [
+    "application": [
         ".apk", ".app", ".bat", ".bin", ".cgi", ".cmd", ".com",
         ".dll", ".exe", ".gadget", ".jar", ".msi", ".pif", ".scr",
         ".vbs", ".wsf"
