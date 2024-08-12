@@ -3,45 +3,93 @@ package config
 import (
 	"bufio"
 	"encoding/json"
-	"file-organizer/pkg"
+	"file-organizer/types"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
+// ConfigLoader handles the loading and management of the configuration.
+type ConfigLoader struct {
+	Path           string
+	FileExtensions types.FileExtensions
+}
+
+// NewConfigLoader loads the file extensions configuration from a specified file.
+//
+// It takes a `configPath` parameter, which is the path to the configuration file.
+// It returns a pointer to a `ConfigLoader` struct and an error.
+func NewConfigLoader(configPath string) (*ConfigLoader, error) {
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read config file %s: %v", configPath, err)
+	}
+
+	var fileExtensions types.FileExtensions
+	if err := json.Unmarshal(data, &fileExtensions); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal config file %s: %v", configPath, err)
+	}
+
+	return &ConfigLoader{
+		Path:           configPath,
+		FileExtensions: fileExtensions,
+	}, nil
+}
+
 func init() {
 	// Register the default configuration
 	RegisterDefaultConfig()
 }
 
+// RegisterDefaultConfig checks if the default configuration file exists and creates
+// it if it doesn't.
+//
+// It first gets the path of the configuration file.
+// Then it checks if the file exists.
+// If the file does not exist, it prompts the user to create an empty configuration.
+// If the user chooses to create the configuration, it creates the configuration directory
+// and the configuration file.
+// Finally, it prints a message indicating the creation of the empty configuration.
 func RegisterDefaultConfig() {
 	configPath := getConfigPath()
-	config := getDefaultConfig(configPath)
+	configExists := configFileExists(configPath)
 
-	if configFileExists(configPath) {
-		fmt.Println("Configuration file already exists at:", configPath)
-		return
-	}
-
-	fmt.Println("Configuration file not found at:", configPath)
-	if shouldCreateEmptyConfig() {
-		if createConfigDirectory(configPath) && createConfigFile(configPath, config) {
-			fmt.Println("Empty configuration created at:", configPath)
+	if !configExists {
+		fmt.Println("Configuration file not found at:", configPath)
+		if shouldCreateEmptyConfig() {
+			config := getDefaultConfig(configPath)
+			if createConfigDirectory(configPath) && createConfigFile(configPath, config) {
+				fmt.Println("Empty configuration created at:", configPath)
+			}
+		} else {
+			fmt.Println("No configuration file created.")
 		}
-	} else {
-		fmt.Println("No configuration file created.")
 	}
 }
 
+// getConfigPath returns the path to the configuration file.
+//
+// It retrieves the value of the HOME environment variable and appends the
+// ".config/file-organizer/config.json" path to it.
+//
+// Returns:
+// - string: the path to the configuration file.
 func getConfigPath() string {
 	return filepath.Join(os.Getenv("HOME"), ".config/file-organizer/config.json")
 }
 
-func getDefaultConfig(configPath string) *pkg.FileOrganizer {
-	return &pkg.FileOrganizer{
+// getDefaultConfig returns a pointer to a ConfigLoader struct with default values.
+//
+// Parameters:
+// - configPath: a string representing the path to the configuration file.
+//
+// Returns:
+// - *ConfigLoader: a pointer to a ConfigLoader struct with default values.
+func getDefaultConfig(configPath string) *ConfigLoader {
+	return &ConfigLoader{
 		Path: configPath,
-		FileExtensions: map[string][]string{
+		FileExtensions: types.FileExtensions{
 			"3d-model":     {},
 			"audio":        {},
 			"video":        {},
@@ -56,11 +104,23 @@ func getDefaultConfig(configPath string) *pkg.FileOrganizer {
 	}
 }
 
+// configFileExists checks if a file exists at the specified path.
+//
+// It takes a `configPath` parameter of type `string`, which is the path to the file.
+//
+// It returns a boolean value indicating whether the file exists or not.
 func configFileExists(configPath string) bool {
 	_, err := os.Stat(configPath)
 	return !os.IsNotExist(err)
 }
 
+// shouldCreateEmptyConfig prompts the user to input a choice whether to generate an empty version or not.
+//
+// It uses the bufio.NewReader to read user input from the standard input.
+// The function continues to prompt the user until a valid input is provided.
+//
+// Returns:
+// - bool: true if the user chooses to generate an empty version, false otherwise.
 func shouldCreateEmptyConfig() bool {
 	reader := bufio.NewReader(os.Stdin)
 
@@ -79,16 +139,27 @@ func shouldCreateEmptyConfig() bool {
 	}
 }
 
+// createConfigDirectory creates the directory for the given config path.
+//
+// Parameters:
+// - configPath: the path to the config file.
+//
+// Returns:
+// - bool: true if the directory was created successfully, false otherwise.
 func createConfigDirectory(configPath string) bool {
-	err := os.MkdirAll(filepath.Dir(configPath), 0755)
-	if err != nil {
-		fmt.Println("Error creating directories:", err)
-		return false
-	}
-	return true
+	err := os.MkdirAll(filepath.Dir(configPath), os.ModePerm)
+	return err == nil
 }
 
-func createConfigFile(configPath string, config *pkg.FileOrganizer) bool {
+// createConfigFile creates a new configuration file at the specified path.
+//
+// Parameters:
+// - configPath: the path to the configuration file.
+// - config: a pointer to the ConfigLoader struct.
+//
+// Returns:
+// - a boolean indicating whether the file was created successfully.
+func createConfigFile(configPath string, config *ConfigLoader) bool {
 	file, err := os.Create(configPath)
 	if err != nil {
 		fmt.Println("Error creating config file:", err)
@@ -96,11 +167,11 @@ func createConfigFile(configPath string, config *pkg.FileOrganizer) bool {
 	}
 	defer file.Close()
 
-	err = json.NewEncoder(file).Encode(config)
-	if err != nil {
-		fmt.Println("Error writing config to file:", err)
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "    ")
+	if err := encoder.Encode(config); err != nil {
+		fmt.Println("Error writing to config file:", err)
 		return false
 	}
-
 	return true
 }
