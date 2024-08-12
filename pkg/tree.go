@@ -6,7 +6,6 @@ import (
 	"strings"
 )
 
-// Directory structure map to hold the tree view
 type DirectoryTree struct {
 	Root *DirectoryNode
 }
