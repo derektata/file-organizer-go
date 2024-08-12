@@ -20,7 +20,7 @@ install:
 	@make build
 	@printf "Installing ${PROJECT}..."
 	@mkdir -p ~/.config/${PROJECT}/
-	@cp config.json ~/.config/${PROJECT}/
+	@cp ./config/config.json ~/.config/${PROJECT}/
 	@mv ${PROJECT} ~/.local/bin/
 	@printf "Done\n"
 
