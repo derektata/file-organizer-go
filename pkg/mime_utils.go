@@ -6,8 +6,8 @@ import (
 	"strings"
 )
 
-// categoryFromMimeType categorizes a file based on its MIME type.
-func (o *FileOrganizer) categoryFromMimeType(filePath string) string {
+// CategoryFromMimeType categorizes a file based on its MIME type.
+func CategoryFromMimeType(filePath string) string {
 	mimeType := guessMimeType(filePath)
 	if mimeType == "" {
 		return ""
