@@ -15,11 +15,14 @@ func Run() {
 	var configPath string
 	var prependDate bool
 	var dryRun bool
+	var verbose bool
 
 	flag.StringVarP(&configPath, "config", "c", filepath.Join(os.Getenv("HOME"), ".config/file-organizer/config.json"), "The path to the configuration file")
 	flag.StringVarP(&path, "directory", "d", "", "Path to organize files")
 	flag.BoolVarP(&prependDate, "prepend-date", "", false, "Prepend the current date to the file name")
 	flag.BoolVarP(&dryRun, "dry-run", "", false, "Perform a dry run without moving files")
+	flag.BoolVarP(&verbose, "verbose", "v", false, "Show detailed output")
+
 	flag.Parse()
 
 	if path == "" {
@@ -33,9 +36,9 @@ func Run() {
 	fileOrganizer := &pkg.FileOrganizer{
 		Path:    path,
 		Config:  configLoader,
-		Options: pkg.OrganizerOptions{PrependDate: prependDate},
+		Options: pkg.OrganizerOptions{PrependDate: prependDate, DryRun: dryRun, Verbose: verbose},
 	}
 
-	err = fileOrganizer.OrganizeFiles(prependDate, dryRun)
+	err = fileOrganizer.OrganizeFiles()
 	pkg.CheckErr(err, "Failed to organize files: %v", err)
 }
