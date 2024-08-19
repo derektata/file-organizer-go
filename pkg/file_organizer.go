@@ -31,12 +31,14 @@ type OrganizerOptions struct {
 // The dryRun parameter determines whether to simulate the organization or perform the actual move operation.
 // Returns an error if the operation fails.
 func (o *FileOrganizer) OrganizeFiles() error {
+	pathStyle := chalk.Magenta.NewStyle().
+		WithTextStyle(chalk.Bold).Style
+	dryStyle := chalk.Yellow.NewStyle().
+		WithTextStyle(chalk.Bold).Style
 	if o.Options.Verbose {
-		fmt.Printf("Starting organization in '%s'...\n", o.Path)
+		fmt.Printf("Starting organization in '%s'...\n", pathStyle(o.Path))
 		if o.Options.DryRun {
-			dryLabel := chalk.Yellow.NewStyle().
-				WithTextStyle(chalk.Bold).Style
-			fmt.Printf("%s: No files will be moved.\n", dryLabel("Dry-run mode"))
+			fmt.Printf("%s: No files will be moved.\n", dryStyle("Dry-run mode"))
 		}
 	}
 
@@ -59,30 +61,33 @@ func (o *FileOrganizer) OrganizeFiles() error {
 		category := filepath.Base(filepath.Dir(destPath))
 
 		if o.Options.DryRun {
-			simLabel := chalk.Cyan.NewStyle().
+			simStyle := chalk.Cyan.NewStyle().
 				WithTextStyle(chalk.Bold).Style
 			// Simulate the organization by adding to the simulated structure
 			simulated[category] = append(simulated[category], dest)
 			if o.Options.Verbose {
-				fmt.Printf("%s: %s -> %s\n", simLabel("Simulated move"), src, destPath)
+				fmt.Printf("%s: %s -> %s\n", simStyle("Simulated move"), src, destPath)
 			}
 		} else {
 			// Actual move operation
 			err := o.moveFile(src, destPath)
 			CheckErr(err, "failed to move file %s: %v", src, err)
 			if o.Options.Verbose {
-				fmt.Printf("Moved: %s -> %s\n", src, destPath)
+				style := chalk.Blue.NewStyle().
+					WithTextStyle(chalk.Bold).Style
+				fmt.Printf("%s: %s -> %s\n", style("Moved"), src, destPath)
 			}
 		}
 	}
 
 	if o.Options.DryRun {
-		// Display the simulated tree structure
 		o.printSimulatedTree(simulated)
 	}
 
 	if o.Options.Verbose {
-		fmt.Println("Organization completed.")
+		style := chalk.Green.NewStyle().
+			WithTextStyle(chalk.Bold).Style
+		fmt.Println(style("Organization completed."))
 	}
 
 	return nil
@@ -157,12 +162,13 @@ func (o *FileOrganizer) findCategory(ext string) (string, bool) {
 // simulated: A map of categories to a slice of file names.
 // This function does not return anything.
 func (o *FileOrganizer) printSimulatedTree(simulated map[string][]string) {
-	dryLabel := chalk.Yellow.NewStyle().
+	dryStyle := chalk.Yellow.NewStyle().
 		WithTextStyle(chalk.Bold).Style
-	pathLabel := chalk.Magenta.NewStyle().
+	pathStyle := chalk.Magenta.NewStyle().
 		WithTextStyle(chalk.Bold).Style
-	fmt.Printf("%s. Displaying where files will be organized within '%s':\n", dryLabel("Dry-run mode enabled"), pathLabel(o.Path))
-	fmt.Println(filepath.Base(o.Path) + "/")
+	fmt.Printf("%s. Displaying where files will be organized within '%s':\n", dryStyle("Dry-run mode enabled"), pathStyle(o.Path))
+	baseStyle := chalk.Italic.NewStyle().Style
+	fmt.Println(baseStyle(filepath.Base(o.Path) + "/"))
 
 	// Get the keys (categories) in a sorted order for consistent output
 	categories := make([]string, 0, len(simulated))
@@ -178,11 +184,11 @@ func (o *FileOrganizer) printSimulatedTree(simulated map[string][]string) {
 			categoryPrefix = "└── "
 		}
 
-		catLabel := chalk.Blue.NewStyle().
+		catStyle := chalk.Blue.NewStyle().
 			WithTextStyle(chalk.Bold).Style
 
 		// Print the category branch
-		fmt.Println(categoryPrefix + catLabel(cat+"/"))
+		fmt.Println(categoryPrefix + catStyle(cat+"/"))
 
 		// Get the files in this category
 		files := simulated[cat]
