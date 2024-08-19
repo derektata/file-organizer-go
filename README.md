@@ -41,6 +41,7 @@ Usage of file-organizer:
   -d, --directory string   Path to organize files
       --dry-run            Perform a dry run without moving files
       --prepend-date       Prepend the current date to the file name
+  -v, --verbose            Show detailed output
 ```
 
 ## License
