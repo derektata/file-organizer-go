@@ -14,7 +14,7 @@ git clone https://github.com/derektata/file-organizer-go.git
 cd file-organizer-go
 ```
 
-### Using Make (non-Nix users)
+### Using Make
 ```
 make
 ```
