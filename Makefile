@@ -82,11 +82,11 @@ uninstall:
 
 # Display help screen
 help:
-	@echo "Usage: make [target]\n"
+	@echo "\nUsage: make [target]\n"
 	@echo "Targets:\n"
-	@echo "  all         : Clean and build the project\n"
-	@echo "  build       : Build the project for all architectures and compress with UPX\n"
-	@echo "  clean       : Remove the built executables\n"
-	@echo "  install     : Build and install the project locally\n"
-	@echo "  uninstall   : Uninstall the project locally\n"
+	@echo "  all         : Clean and build the project"
+	@echo "  build       : Build the project for all architectures and compress with UPX"
+	@echo "  clean       : Remove the built executables"
+	@echo "  install     : Build and install the project locally"
+	@echo "  uninstall   : Uninstall the project locally"
 	@echo "  help        : Show this help message\n"
