@@ -16,14 +16,21 @@ func Run() {
 	var prependDate bool
 	var dryRun bool
 	var verbose bool
+	var version bool
 
 	flag.StringVarP(&configPath, "config", "c", filepath.Join(os.Getenv("HOME"), ".config/file-organizer/config.json"), "The path to the configuration file")
 	flag.StringVarP(&path, "directory", "d", "", "Path to organize files")
 	flag.BoolVarP(&prependDate, "prepend-date", "", false, "Prepend the current date to the file name")
 	flag.BoolVarP(&dryRun, "dry-run", "", false, "Perform a dry run without moving files")
 	flag.BoolVarP(&verbose, "verbose", "v", false, "Show detailed output")
+	flag.BoolVar(&version, "version", false, "Show the version number")
 
 	flag.Parse()
+
+	if version {
+		fmt.Println(Version())
+		return
+	}
 
 	if path == "" {
 		fmt.Println("Error: You must specify a directory to organize using the -d flag.")
