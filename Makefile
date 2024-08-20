@@ -1,43 +1,92 @@
 PROJECT = file-organizer
+OUTPUT_DIR = build
+INSTALL_DIR = /usr/local/bin
+
+# List of OS and architecture pairs to build for
+OS_ARCH_PAIRS = \
+	linux/amd64 \
+	linux/arm64 \
+	darwin/amd64 \
+	darwin/arm64 \
+	windows/amd64 \
+	windows/arm64
+
+# List of unsupported OS/ARCH pairs for UPX compression
+UNSUPPORTED_UPX_PAIRS = \
+	darwin/amd64 \
+	darwin/arm64 \
+	windows/arm64
 
 .PHONY: all build clean install uninstall help
 
 # Default target
-all: clean install
+all: clean build
 
-# Build the project
+# Determine output name based on OS and architecture
+define build_target
+	OS=$(1); \
+	ARCH=$(2); \
+	OUTPUT_NAME=$(OUTPUT_DIR)/$(PROJECT)-$$OS-$$ARCH; \
+	if [ "$$OS" = "windows" ]; then OUTPUT_NAME=$$OUTPUT_NAME.exe; fi; \
+	echo "Building $$OUTPUT_NAME..."; \
+	GOOS=$$OS GOARCH=$$ARCH go build -o $$OUTPUT_NAME; \
+	$(call compress_target,$$OUTPUT_NAME,$$OS,$$ARCH)
+endef
+
+# Compress the binary if supported
+define compress_target
+	OUTPUT_NAME=$(1); \
+	OS=$(2); \
+	ARCH=$(3); \
+	if echo "$(UNSUPPORTED_UPX_PAIRS)" | grep -q "$$OS/$$ARCH"; then \
+		echo "Skipping UPX compression for $$OUTPUT_NAME (unsupported platform)"; \
+	else \
+		echo "Compressing $$OUTPUT_NAME with UPX..."; \
+		upx --best $$OUTPUT_NAME || echo "UPX compression failed for $$OUTPUT_NAME"; \
+	fi
+endef
+
+# Build the project for all architectures
 build:
-	@if [ ! -f ${PROJECT} ]; then printf "Building ${PROJECT}..." \
-	&& go build -o ${PROJECT} && printf "Done\n"; fi
+	@echo "Building ${PROJECT} for multiple platforms..."
+	@mkdir -p $(OUTPUT_DIR)
+	@for os_arch in $(OS_ARCH_PAIRS); do \
+		OS=$$(echo $$os_arch | cut -d'/' -f1); \
+		ARCH=$$(echo $$os_arch | cut -d'/' -f2); \
+		$(call build_target,$$OS,$$ARCH); \
+	done
+	@echo "All builds and compressions completed."
 
 # Clean the built files
 clean:
-	@if [ -f ${PROJECT} ]; then printf "Cleaning ${PROJECT}..." \
-	&& rm -f ${PROJECT} && printf "Done\n"; fi
+	@echo "Cleaning built files..."
+	@rm -rf $(OUTPUT_DIR)
+	@echo "Done"
 
-# Install the project
-install:
-	@make build
-	@printf "Installing ${PROJECT}..."
+# Install the binary/config locally
+install: clean
+	@echo "Building ${PROJECT} for local installation..."
+	GOOS=$(shell go env GOOS) GOARCH=$(shell go env GOARCH) go build -o $(OUTPUT_DIR)/$(PROJECT)
+	@echo "Installing ${PROJECT} to $(INSTALL_DIR)..."
+	@install -m 755 $(OUTPUT_DIR)/$(PROJECT) $(INSTALL_DIR)/
 	@mkdir -p ~/.config/${PROJECT}/
 	@cp ./config/config.json ~/.config/${PROJECT}/
-	@mv ${PROJECT} ~/.local/bin/
-	@printf "Done\n"
+	@echo "Installation completed."
 
-# Uninstall the project
+# Uninstall the binary/config locally
 uninstall:
-	@printf "Uninstalling ${PROJECT}..."
+	@echo "Uninstalling ${PROJECT} from $(INSTALL_DIR)..."
+	@rm -f $(INSTALL_DIR)/$(PROJECT)
 	@rm -rf ~/.config/${PROJECT}/
-	@rm -f ~/.local/bin/${PROJECT}
-	@printf "Done\n"
+	@echo "Uninstallation completed."
 
 # Display help screen
 help:
-	@printf "Usage: make [target]\n\n"
-	@printf "Targets:\n"
-	@printf "  all        : Clean and install the project\n"
-	@printf "  build      : Build the project executable\n"
-	@printf "  clean      : Remove the built executable\n"
-	@printf "  install    : Build and install the project\n"
-	@printf "  uninstall  : Uninstall the project\n"
-	@printf "  help       : Show this help message\n"
+	@echo "Usage: make [target]\n"
+	@echo "Targets:\n"
+	@echo "  all         : Clean and build the project\n"
+	@echo "  build       : Build the project for all architectures and compress with UPX\n"
+	@echo "  clean       : Remove the built executables\n"
+	@echo "  install     : Build and install the project locally\n"
+	@echo "  uninstall   : Uninstall the project locally\n"
+	@echo "  help        : Show this help message\n"
