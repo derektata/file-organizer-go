@@ -38,7 +38,7 @@ func (o *FileOrganizer) OrganizeFiles() error {
 	if o.Options.Verbose {
 		fmt.Printf("Starting organization in '%s'...\n", pathStyle(o.Path))
 		if o.Options.DryRun {
-			fmt.Printf("%s: No files will be moved.\n", dryStyle("Dry-run mode"))
+			fmt.Printf("%s. No files will be moved.\n", dryStyle("Dry-run mode enabled"))
 		}
 	}
 
@@ -167,7 +167,7 @@ func (o *FileOrganizer) printSimulatedTree(simulated map[string][]string) {
 	pathStyle := chalk.Magenta.NewStyle().
 		WithTextStyle(chalk.Bold).Style
 	fmt.Printf("%s. Displaying where files will be organized within '%s':\n", dryStyle("Dry-run mode enabled"), pathStyle(o.Path))
-	baseStyle := chalk.Italic.NewStyle().Style
+	baseStyle := chalk.Magenta.NewStyle().WithTextStyle(chalk.Italic).Style
 	fmt.Println(baseStyle(filepath.Base(o.Path) + "/"))
 
 	// Get the keys (categories) in a sorted order for consistent output
